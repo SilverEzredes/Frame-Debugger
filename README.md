@@ -1,4 +1,4 @@
-# Frame-Debugger
+# Frame Debugger
 
 A runtime frame debugger made for RE Engine games with the option to capture the frame data and export it to a CSV file utilizing [REFramework](https://github.com/praydog/REFramework).
 
