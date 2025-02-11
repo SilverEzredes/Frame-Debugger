@@ -2,11 +2,11 @@
 local modName =  "Frame Debugger"
 
 local modAuthor = "SilverEzredes"
-local modUpdated = "02/05/2025"
-local modVersion = "v1.0.00"
+local modUpdated = "02/11/2025"
+local modVersion = "v1.0.01"
 local modCredits = "alphaZomega; praydog"
-local modNotes = "Required _ScriptCore version 1.1.92+\nTested in:\n - MHWilds OBT1\n - RE4R"
-local modChangeLog = "v1.0.00\n - Initial release"
+local modNotes = "Required _ScriptCore version: 1.1.92+\nTested in:\n - MHWilds OBT1\n - RE4R"
+local modChangeLog = "v1.0.01\n - Small UI changes\n\nTestedv1.0.00\n - Initial release"
 
 --/////////////////////////////////////--
 local func = require("_SharedCore/Functions")
@@ -18,7 +18,7 @@ local wc = false
 
 local appSingelton = sdk.get_native_singleton("via.Application")
 local appType = sdk.find_type_definition("via.Application")
-
+local frameTimePeak = 0.0
 local frameTimeRecord = {}
 local debugToolDefaultSettings = {
     maxFrameTime = 0.0,
@@ -100,10 +100,13 @@ local function record_FrameTime()
     debugToolSettings.maxFrameTime = sdk.call_native_func(appSingelton, appType, "get_FrameTimeMillisecond")
     add_ToHistory(debugToolSettings.maxFrameTime, frameTimeRecord, debugToolSettings.recordMaxSize, debugToolSettings.currFrame)
 end
+
 local function setup_FrameDebugger()
     ui.textButton_ColoredValue("OS:", debugToolSettings.OS, func.convert_rgba_to_ABGR(ui.colors.cerulean))
     imgui.same_line()
     ui.textButton_ColoredValue("Current Frame:", debugToolSettings.currFrame, func.convert_rgba_to_ABGR(ui.colors.gold))
+
+    changed, debugToolSettings.isNewWindow = imgui.checkbox("Use Separate Window", debugToolSettings.isNewWindow); wc = wc or changed
     
     imgui.spacing()
 
@@ -113,6 +116,12 @@ local function setup_FrameDebugger()
         else
             ui.progressBar_DynamicColor(string.format("Frame Time: %.3fms", debugToolSettings.maxFrameTime), false, 0, func.convert_rgba_to_ABGR(ui.colors.white), func.convert_rgba_to_ABGR(ui.colors.red), func.convert_rgba_to_ABGR(ui.colors.green), func.convert_rgba_to_ABGR(ui.colors.REFgray), debugToolSettings.frameTimeCritical, debugToolSettings.maxFrameTime, 100.0, 300.0, 5.0)
         end
+        if debugToolSettings.maxFrameTime >= 100.0 then
+            frameTimePeak = debugToolSettings.maxFrameTime
+        end
+        
+        imgui.text(string.format("Last Major Peak: %.3fms", frameTimePeak))
+
         if debugToolSettings.showFrameRecord then
             ui.button_CheckboxStyle("[ REC ]", debugToolSettings, "isRecFrameTime", func.convert_rgba_to_ABGR(ui.colors.REFgray), func.convert_rgba_to_ABGR(ui.colors.deepRed), func.convert_rgba_to_ABGR(ui.colors.deepRed))
             
@@ -154,6 +163,11 @@ local function setup_FrameDebugger()
             imgui.tree_pop()
         end
     end
+    if changed or wc then
+        json.dump_file("SILVER/_Debug/FrameDebuggerSettings.json", debugToolSettings)
+        changed = false
+        wc = false
+    end
 end
 local function draw_FrameDebugger()
     if imgui.tree_node(modName) then
@@ -176,7 +190,7 @@ local function draw_FrameDebugger()
                 debugToolSettings = hk.recurse_def_settings({}, debugToolDefaultSettings)
             end
             imgui.push_item_width(250)
-            changed, debugToolSettings.isNewWindow = imgui.checkbox("Use Separate Window", debugToolSettings.isNewWindow); wc = wc or changed
+            
             changed, debugToolSettings.showFrameTime = imgui.checkbox("Show Frame Time", debugToolSettings.showFrameTime); wc = wc or changed
             changed, debugToolSettings.showFrameRecord = imgui.checkbox("Show Frame Recorder UI", debugToolSettings.showFrameRecord); wc = wc or changed
             changed, debugToolSettings.frameTimeCritical = ui.imgui_safe_input(imgui.drag_float, debugToolSettings.frameTimeCritical, "Critical Frame Time", debugToolSettings.frameTimeCritical, {0.001, 0.0, 100.0, "%.3fms"}); wc = wc or changed
