@@ -4,6 +4,10 @@ A runtime frame debugger made for RE Engine games utilizing [REFramework](https:
 
 <img src="https://github.com/SilverEzredes/Frame-Debugger/blob/main/images/MonsterHunterWildsBeta-FrameDebugger-01.gif">
 
+### Requirements:
+- [REFramework](https://github.com/praydog/REFramework-nightly/releases)
+- [_ScriptCore v1.2.02+](https://github.com/alphazolam/_ScriptCore/tree/SILVER-Dev)
+
 ### Supported Games:
 - Monster Hunter Wilds
 - Resident Evil 2 Remake (DX12)
@@ -11,6 +15,7 @@ A runtime frame debugger made for RE Engine games utilizing [REFramework](https:
 - Resident Evil 4 Remake
 - Resident Evil 7 (DX12)
 - Resident Evil Village
+- Pragmata (Demo)
 
 ## Options:
 - Frame Time Graph
